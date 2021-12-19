@@ -16,17 +16,16 @@ pub enum StripeError {
     JSONSerialize(#[from] serde_json::Error),
     #[error("attempted to access an unsupported version of the api")]
     UnsupportedVersion,
-    #[error("error communicating with stripe")]
-    ClientError,
+    #[error("error communicating with stripe: {0}")]
+    ClientError(String),
     #[error("timeout communicating with stripe")]
     Timeout,
 }
 
 #[cfg(feature = "hyper")]
 impl From<hyper::Error> for StripeError {
-    fn from(_err: hyper::Error) -> StripeError {
-        println!("HYPER ERROR: {:?}", _err);
-        StripeError::ClientError
+    fn from(err: hyper::Error) -> StripeError {
+        StripeError::ClientError(err.to_string())
     }
 }
 
